@@ -22,7 +22,7 @@ parser.add_argument("-p", help="bind stats port")
 args = parser.parse_args()
 
 # Configurable port
-port = 8080
+port = 8653
 if args.p:
     port = args.p
 
