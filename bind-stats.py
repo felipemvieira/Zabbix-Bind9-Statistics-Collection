@@ -15,14 +15,14 @@ CACHELIFE = 60
 
 parser = argparse.ArgumentParser()
 parser.add_argument("action", help="discoverzones | counter | zonecounter | zonemaintenancecounter | resolvercounter "
-                                   "| socketcounter | incounter | outcounter")
+                                   "| socketcounter | incounter | outcounter | printcounters")
 parser.add_argument("-z", help="zone")
 parser.add_argument("-c", help="counter name")
 parser.add_argument("-p", help="bind stats port")
 args = parser.parse_args()
 
 # Configurable port
-port = 8653
+port = 8080
 if args.p:
     port = args.p
 
@@ -184,6 +184,21 @@ elif args.action == 'zonecounter':
         print("ZBX_NOTSUPPORTED")
         sys.exit(1)
 
+elif args.action == 'printcounters':
+    HOSTNAME="{}".format(os.uname().nodename)
+    
+    sections = tuple(j.keys())
+    for section in sections:
+        if section == 'zones':
+            for zone_name, n_counters in j[section].items():
+                for n_counter, value in n_counters.items():
+                    print("{} bind.{}[{},{}] {}".format(HOSTNAME,section,zone_name,n_counter, str(value)))
+        else:
+            for n_counter, value in j[section].items():
+                print("{} bind.{}[{}] {}".format(HOSTNAME,section,n_counter, str(value)))
+
+    sys.exit(0)
+
 else:
     if not args.c:
         print("Missing argument", file=sys.stderr)
@@ -195,3 +210,4 @@ else:
     else:
         print("ZBX_NOTSUPPORTED")
         sys.exit(1)
+
